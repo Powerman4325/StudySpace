@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>11-Subject Percentage Calculator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="calculator-page">
+<div class="calculator-card">
+<a href="index.html" class="back-link">← Back to Home</a>
+<h2>Subject Calculator</h2>
+<p class="calculator-description">Enter your marks for all 11 subjects.</p>
+<div class="grid" id="subjects-container"></div>
+<button type="button" id="calculate-btn">Calculate Percentage</button>
+<div class="result" id="result-display" aria-live="polite"></div>
+</div>
+<script>
+const container = document.getElementById("subjects-container");
+const calculateButton = document.getElementById("calculate-btn");
+const resultDisplay = document.getElementById("result-display");
+const subjects = [
+"Hindi",
+"Marathi",
+"Eng. Language",
+"Eng. Literature",
+"Maths",
+"Computers",
+"History",
+"Geography",
+"Physics",
+"Chemistry",
+"Biology"];
+subjects.forEach((subject, index) => {
+const i = index + 1;
+const group = document.createElement("div");
+group.className = "input-group";
+const label = document.createElement("label");
+label.htmlFor = `sub${i}`;
+label.textContent = `${subject} (Out of 100)`;
+const input = document.createElement("input");
+input.type = "number";
+input.id = `sub${i}`;
+input.min = "0";
+input.max = "100";
+input.step = "any";
+input.placeholder = "Enter marks";
+input.setAttribute("aria-label", `${subject} marks`);
+group.appendChild(label);
+group.appendChild(input);
+container.appendChild(group);});
+calculateButton.addEventListener("click", calculatePercentage);
+function calculatePercentage() {
+let totalMarks = 0;
+for (let i = 1; i <= 11; i++) {
+const input = document.getElementById(`sub${i}`);
+const value = input.value.trim();
+if (value !== "") {
+const marks = Number(value);
+if (!Number.isFinite(marks) || marks < 0 || marks > 100) {
+resultDisplay.textContent = `Subject ${i}: enter marks between 0 and 100.`;
+resultDisplay.style.display = "block";
+input.focus();
+return;}
+totalMarks += marks;}}
+const percentage = (totalMarks / 1100) * 100;
+resultDisplay.textContent = `Your Percentage: ${percentage.toFixed(2)}%`;
+resultDisplay.style.display = "block";}
+</script>
+</body>
+</html>

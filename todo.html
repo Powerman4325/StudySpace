@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-do List | StudySpace</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="todo-page">
+<main class="todo-card">
+<a href="index.html" class="todo-back">← Back to Home</a>
+<h1>My To-do List</h1>
+<p class="todo-subtitle">One task at a time. Get things done.</p>
+<form id="todo-form">
+<label for="task-name">Task or assignment</label>
+<input id="task-name" type="text" placeholder="e.g. Complete Maths homework" maxlength="150" required>
+<div class="todo-fields">
+<div>
+<label for="task-subject">Subject</label>
+<select id="task-subject" required>
+<option value="">Choose subject</option>
+<option>Hindi</option>
+<option>Marathi</option>
+<option>Eng. Language</option>
+<option>Eng. Literature</option>
+<option>Maths</option>
+<option>Computers</option>
+<option>History</option>
+<option>Geography</option>
+<option>Physics</option>
+<option>Chemistry</option>
+<option>Biology</option>
+<option>Other</option>
+</select>
+</div>
+<div>
+<label for="task-date">Due date</label>
+<input id="task-date" type="date">
+</div>
+</div>
+<label for="task-priority">Priority</label>
+<select id="task-priority">
+<option value="low">Low</option>
+<option value="medium" selected>Medium</option>
+<option value="high">High</option>
+</select>
+<button type="submit" class="todo-add">+ Add Task</button>
+</form>
+<div class="todo-summary">
+<div><strong id="total-count">0</strong><span>Total</span></div>
+<div><strong id="pending-count">0</strong><span>Pending</span></div>
+<div><strong id="completed-count">0</strong><span>Completed</span></div>
+</div>
+<div class="todo-filters" aria-label="Filter tasks">
+<button type="button" data-filter="all" class="active">All</button>
+<button type="button" data-filter="pending">Pending</button>
+<button type="button" data-filter="completed">Completed</button>
+</div>
+<p id="empty-message">No tasks yet. Add your first task above.</p>
+<ul id="task-list"></ul>
+</main>
+<script>
+const form = document.getElementById("todo-form");
+const taskName = document.getElementById("task-name");
+const taskSubject = document.getElementById("task-subject");
+const taskDate = document.getElementById("task-date");
+const taskPriority = document.getElementById("task-priority");
+const taskList = document.getElementById("task-list");
+const emptyMessage = document.getElementById("empty-message");
+let tasks = [];
+let activeFilter = "all";
+try {
+const savedTasks = JSON.parse(localStorage.getItem("studyspace-tasks") || "[]");
+if (Array.isArray(savedTasks)) {
+tasks = savedTasks.filter(task =>
+task &&
+typeof task.id === "string" &&
+typeof task.name === "string" &&
+typeof task.subject === "string" &&
+typeof task.completed === "boolean" &&
+["low", "medium", "high"].includes(task.priority));}} 
+catch {
+tasks = [];}
+form.addEventListener("submit", function(event) {
+event.preventDefault();
+const name = taskName.value.trim();
+if (!name || !taskSubject.value) return;
+tasks.push({
+id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+name: name,
+subject: taskSubject.value,
+date: taskDate.value,
+priority: taskPriority.value,
+completed: false});
+saveTasks();
+form.reset();
+taskPriority.value = "medium";
+renderTasks();
+taskName.focus();});
+document.querySelectorAll(".todo-filters button").forEach(button => {
+button.addEventListener("click", function() {
+activeFilter = button.dataset.filter;
+document.querySelectorAll(".todo-filters button").forEach(item => {
+item.classList.toggle("active", item === button);});
+renderTasks();});});
+function saveTasks() {
+try {
+localStorage.setItem("studyspace-tasks", JSON.stringify(tasks));}
+catch {
+alert("Tasks could not be saved. Check your browser storage settings.");}}
+function renderTasks() {
+taskList.replaceChildren();
+const completed = tasks.filter(task => task.completed).length;
+document.getElementById("total-count").textContent = tasks.length;
+document.getElementById("pending-count").textContent = tasks.length - completed;
+document.getElementById("completed-count").textContent = completed;
+const visibleTasks = tasks.filter(task => {
+if (activeFilter === "pending") return !task.completed;
+if (activeFilter === "completed") return task.completed;
+return true;});
+emptyMessage.hidden = visibleTasks.length > 0;
+emptyMessage.textContent = tasks.length === 0
+? "No tasks yet. Add your first task above."
+: "No tasks in this filter.";
+visibleTasks.sort((a, b) => {
+if (a.completed !== b.completed) return Number(a.completed) - Number(b.completed);
+if (!a.date) return b.date ? 1 : 0;
+if (!b.date) return -1;
+return a.date.localeCompare(b.date);});
+visibleTasks.forEach(task => {
+const item = document.createElement("li");
+item.className = "todo-item" + (task.completed ? " is-completed" : "");
+const checkbox = document.createElement("input");
+checkbox.type = "checkbox";
+checkbox.className = "todo-check";
+checkbox.checked = task.completed;
+checkbox.setAttribute("aria-label", `Mark ${task.name} completed`);
+checkbox.addEventListener("change", function() {
+task.completed = checkbox.checked;
+saveTasks();
+renderTasks();});
+const content = document.createElement("div");
+content.className = "todo-content";
+const name = document.createElement("div");
+name.className = "todo-task-name";
+name.textContent = task.name;
+content.appendChild(name);
+const meta = document.createElement("div");
+meta.className = "todo-meta";
+const subject = document.createElement("span");
+subject.className = "todo-tag";
+subject.textContent = task.subject;
+meta.appendChild(subject);
+const priority = document.createElement("span");
+priority.className = "todo-tag " + task.priority;
+priority.textContent = task.priority[0].toUpperCase() + task.priority.slice(1) + " priority";
+meta.appendChild(priority);
+if (task.date) {
+const dueDate = document.createElement("span");
+dueDate.className = "todo-tag";
+dueDate.textContent = "Due: " + task.date;
+meta.appendChild(dueDate);}
+content.appendChild(meta);
+const deleteButton = document.createElement("button");
+deleteButton.type = "button";
+deleteButton.className = "todo-delete";
+deleteButton.textContent = "Delete";
+deleteButton.setAttribute("aria-label", `Delete ${task.name}`);
+deleteButton.addEventListener("click", function() {
+    tasks = tasks.filter(item => item.id !== task.id);
+    saveTasks();
+    renderTasks();});
+item.append(checkbox, content, deleteButton);
+taskList.appendChild(item);});}
+renderTasks();
+</script>
+</body>
+</html>

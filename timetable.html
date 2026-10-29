@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>School Timetable</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+<div>
+<p class="eyebrow">STUDENT PLANNER</p>
+<h1>SCHOOL TIMETABLE</h1>
+</div>
+<div class="header-buttons">
+<button id="todayBtn" class="secondary-btn">Today</button>
+<button id="saveBtn" class="primary-btn">Save Timetable</button>
+</div>
+</header>
+<main class="container">
+<section class="setup-card">
+<div class="input-group">
+<label for="studentClass">STD</label>
+<input type="text" id="studentClass" maxlength="20" placeholder="Example: 10A">
+</div>
+<div class="input-group">
+<label for="studentName">Student Name</label>
+<input type="text" id="studentName" maxlength="40" placeholder="Optional">
+</div>
+<button id="clearBtn" class="danger-btn">Clear Timetable</button>
+</section>
+<section class="status-card">
+<div class="status-item">
+<span class="status-label">Current Day</span>
+<strong id="dayLabel">—</strong>
+</div>
+<div class="status-item">
+<span class="status-label">Current Period</span>
+<strong id="periodLabel">—</strong>
+</div>
+<div class="status-item">
+<span class="status-label">Save Status</span>
+<strong id="savedLabel">Not saved</strong>
+</div>
+</section>
+<section class="table-card">
+<div class="table-heading">
+<div>
+<h2>WEEKLY SCHEDULE</h2>
+<p>Enter your subjects below.</p>
+</div>
+<button id="printBtn" class="secondary-btn">Print</button>
+</div>
+<div class="table-wrapper">
+<table id="timetable">
+<thead>
+<tr>
+<th>Period No.</th>
+<th>Time</th>
+<th data-day="Monday">Monday</th>
+<th data-day="Tuesday">Tuesday</th>
+<th data-day="Wednesday">Wednesday</th>
+<th data-day="Thursday">Thursday</th>
+<th data-day="Friday">Friday</th>
+</tr>
+</thead>
+<tbody id="tableBody">
+</tbody>
+</table>
+</div>
+</section>
+<p class="footer-note">Your timetable is saved locally in your browser.</p>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
